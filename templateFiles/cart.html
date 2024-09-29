@@ -1,0 +1,58 @@
+<div class="container-fluid" ng-controller="CartController as cartCtrl">
+    <section class="pt-5 pb-5">
+        <div class="container">
+          <div class="row w-100">
+              <div class="col-lg-12 col-md-12 col-12">
+                  <h1 class="display-5 mb-2 text-center mb-5">Shopping Cart</h1>
+                  <table id="shoppingCart" class="table table-condensed table-responsive">
+                      <thead>
+                          <tr>
+                              <th style="width:60%">Product</th>
+                              <th style="width:12%">Price</th>
+                              <th style="width:10%">Quantity</th>
+                              <th style="width:16%"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td data-th="Product">
+                                  <div class="row">
+                                      <div class="col-md-3 text-left">
+                                          <img src="" alt="Product Image" class="img-fluid d-none d-md-block rounded mb-2 shadow ">
+                                      </div>
+                                      <div class="col-md-9 text-left mt-sm-2">
+                                          <h4>Product Name</h4>
+                                          <p class="font-weight-light">Description</p>
+                                      </div>
+                                  </div>
+                              </td>
+                              <td data-th="Price">0</td>
+                              <td data-th="Quantity">
+                                  <input type="number" class="form-control form-control-lg text-center" value="1">
+                              </td>
+                              <td class="actions">
+                                  <div class="text-right">
+                                      <button class="btn btn-white border-secondary bg-white btn-md mb-2">
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  <div class="float-right text-right">
+                      <h4>Total:</h4>
+                      <h1>0</h1>
+                  </div>
+              </div>
+          </div>
+          <div class="row mt-4 d-flex align-items-center">
+              <div class="col-sm-6 order-md-2 text-right">
+                  <a ui-sref="order" class="btn mb-4 btn-lg pl-5 pr-5" style="background-color: #bfbbee;">Checkout</a>
+              </div>
+              <div class="col-sm-6 mb-3 mb-m-1 order-md-1 text-md-left">
+                  <button class="btn my-2 my-sm-0" style="border: none;"><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.2em" viewBox="0 0 24 24"><path fill="black" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1"/></svg> Continue Shopping</button>
+              </div>
+          </div>
+      </div>
+      </section>
+</div>

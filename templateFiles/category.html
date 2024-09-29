@@ -1,0 +1,103 @@
+<div ng-controller="CategController as categCtrl">
+    <nav class="navbar sticky-top navbar-light justify-content-between d-flex flex-wrap" style="background-color: white;">
+        <form class="form-inline">
+            <a class="navbar-brand">
+                <img src="images/logo.jpeg" width="100" alt="logo">
+            </a>
+            <button class="btn my-2 my-sm-0 " style="border: none;" type="submit"><a ui-sref="admin">Dashboard</a></button>
+            <button class="btn my-2 my-sm-0" style="border: none;" type="submit"><a ui-sref="category">Categories</a></button>
+            <button class="btn my-2 my-sm-0" style="border: none;" type="submit"><a ui-sref="order">Order Details</a></button>
+        </form>
+        <form class="form-inline">
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                  Add Category
+                </button>
+            </p>
+            <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+                    <form id="form" name="addCategoryForm" method="post" enctype="multipart/form-data">
+                        <h5 class="mb-2 text-center">Add Category Details</h5>
+                        <div class="form-group mb-2">
+                            <label for="category-name" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="category-name" ng-model="categCtrl.newCategory.name" required>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="category-description" class="col-form-label">Description:</label>
+                            <textarea class="form-control" id="category-description" ng-model="categCtrl.newCategory.description" required></textarea>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="category-image" class="col-form-label">Image:</label>
+                            <input type="file" class="form-control" id="category-image" accept="image/*" onchange="angular.element(this).scope().categCtrl.img(this)" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" ng-click="categCtrl.addCategory()" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </form>
+    </nav><br><br><br>
+
+    <section id="category-details">
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="category in categCtrl.categories">
+                        <td>{{category.id}}</td>
+                        <td>
+                            <img ng-src="{{categCtrl.getImageUrl(category.category_image)}}" alt="{{category.category_name}}" style="width: 50px; height: 50px;">
+                        </td>
+                        <td>{{category.category_name}}</td>
+                        <td>{{category.category_description}}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success me-1" ng-click="categCtrl.viewProducts(category)">View Products</button>
+                            <button class="btn btn-sm btn-primary me-1" ng-click="categCtrl.editCategory(category)">Edit</button>
+                            <button class="btn btn-sm btn-danger" ng-click="categCtrl.deleteCategory(category.id)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- <section id="order-details" ng-show="admCtrl.currentSection === 'order'">
+        <h2 class="mb-4">Order Details</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="order in admCtrl.orders">
+                        <td>{{order.id}}</td>
+                        <td>{{order.customer_name}}</td>
+                        <td>{{order.date | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                        <td>{{order.total | currency}}</td>
+                        <td>{{order.status}}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" ng-click="admCtrl.viewOrderDetails(order.id)">View</button>
+                            <button class="btn btn-sm btn-warning" ng-click="admCtrl.updateOrderStatus(order.id)">Update Status</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section> -->
+</div>
