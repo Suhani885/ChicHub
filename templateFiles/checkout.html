@@ -1,0 +1,65 @@
+<div class="container" ng-controller="CheckoutController as checkoutCtrl">
+  <h2 class="text-center mt-5 mb-4">Checkout</h2>
+  <form ng-submit="checkoutCtrl.placeOrder()">
+      <div class="row">
+          <div class="col-md-6 mb-3">
+              <label for="firstName">First name</label>
+              <input type="text" class="form-control" id="firstName" ng-model="checkoutCtrl.orderDetails.firstName" pattern="[a-zA-Z]+" maxlength="20" required autocomplete="on">
+          </div>
+          <div class="col-md-6 mb-3">
+              <label for="lastName">Last name</label>
+              <input type="text" class="form-control" id="lastName" ng-model="checkoutCtrl.orderDetails.lastName" pattern="[a-zA-Z]+" maxlength="20" autocomplete="on" required>
+          </div>
+      </div>
+
+      <div class="mb-3">
+          <label for="number">Phone Number</label>
+          <input type="text" class="form-control" pattern="[6 7 8 9][0-9]{9}" autocomplete="on" id="number" ng-model="checkoutCtrl.orderDetails.number" required>
+      </div>
+
+      <div class="mb-3">
+          <label for="address">Address</label>
+          <input type="text" class="form-control" pattern="[A-Z1-9a-z]{1,5}[A-Za-z]{1,}[A-Z1-9a-z]{1,50}" id="address" ng-model="checkoutCtrl.orderDetails.address" autocomplete="on" required>
+      </div>
+
+      <div class="row">
+          <div class="col-md-4 mb-3">
+              <label for="city">City</label>
+              <input pattern="[a-zA-Z]+" maxlength="40" required autocomplete="on" type="text" class="form-control" id="city" ng-model="checkoutCtrl.orderDetails.city" required>
+          </div>
+          <div class="col-md-4 mb-3">
+              <label for="state">State</label>
+              <select class="form-control" id="state" ng-model="checkoutCtrl.orderDetails.state" required>
+                  <option value="">Choose...</option>
+                  <option ng-repeat="state in checkoutCtrl.states">{{state}}</option>
+              </select>
+          </div>
+          <div class="col-md-4 mb-3">
+              <label for="pin">Pincode</label>
+              <input type="text" class="form-control" id="pin" pattern="[1-9][0-9]{5}" ng-model="checkoutCtrl.orderDetails.pin" required>
+          </div>
+      </div>
+
+      <hr class="mb-4">
+
+      <h4 class="mb-3">Payment</h4>
+
+      <div class="d-block my-3">
+          <div class="custom-control custom-radio">
+              <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="credit" required>
+              <label class="custom-control-label" for="credit">Credit card</label>
+          </div>
+          <div class="custom-control custom-radio">
+              <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="debit" required>
+              <label class="custom-control-label" for="debit">Debit card</label>
+          </div>
+          <div class="custom-control custom-radio">
+              <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="paypal" required>
+              <label class="custom-control-label" for="paypal">PayPal</label>
+          </div>
+      </div>
+
+      <hr class="mb-4">
+      <button class="btn btn-primary btn-lg btn-block" type="submit">Place Order</button>
+  </form>
+</div>

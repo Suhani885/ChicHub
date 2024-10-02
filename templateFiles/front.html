@@ -1,0 +1,107 @@
+<div ng-controller="FrontController as frontCtrl" class="container-fluid p-0">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="images/ChicHub.png" width="120" alt="ChicHub logo" class="img-fluid">
+      </a>
+      
+      <div class="d-flex justify-content-center flex-grow-1">
+        <form class="d-flex" ng-submit="frontCtrl.search()" style="width: 50%;">
+          <div class="input-group">
+            <input class="form-control" type="search" placeholder="Find your favourite jewelleries..."
+                   aria-label="Search" ng-model="frontCtrl.searchQuery" ng-change="frontCtrl.search()">
+            <button class="btn btn-outline-secondary" type="submit" style="background-color: white;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6862ab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="d-flex align-items-center">
+        <a ui-sref="cart" class="text-dark me-3" title="Cart">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </a>
+        <a ng-click="frontCtrl.logout()" class="text-dark" title="Logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-3" ng-if="frontCtrl.showSearchResults">
+    <h3 class="mb-4">Search Results</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div class="col mb-4" ng-repeat="product in frontCtrl.searchResults">
+        <div class="card h-100">
+          <img class="card-img-top" ng-src="{{frontCtrl.getImageUrl(product.product_image)}}" alt="{{product.product_name}}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i>{{product.product_name}}</i></h5>
+            <p class="card-text"><strong>Price: Rs.{{product.price_by_quantity}}</strong></p>
+            <button class="btn mt-auto" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" ng-click="frontCtrl.addToCart(product)">
+              Add To Cart
+              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.3em" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2zm-8.9-5h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4l-3.87 7H8.53L4.27 2H1v2h2l3.6 7.59l-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-secondary mt-3" ng-click="frontCtrl.clearSearch()">Clear Search</button>
+  </div>
+
+  <main class="container mt-5" ng-if="!frontCtrl.showSearchResults">
+    <blockquote class="blockquote text-center mt-0 mb-5">
+      <h3 style="font-family: Arial, Helvetica, sans-serif; font-weight: 800;">SHOP BY CATEGORIES</h3>
+    </blockquote>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div class="col mb-4" ng-repeat="category in frontCtrl.categories">
+        <div class="card h-100">
+          <img class="card-img-top" ng-src="{{frontCtrl.getImageUrl(category.category_image)}}" alt="{{category.category_name}}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i>{{category.category_name}}</i></h5>
+            <p class="card-text">{{category.category_description}}</p>
+            <button class="btn mt-auto" style="background-color: #6862ab; color: white;" ng-click="frontCtrl.fetchProducts(category);frontCtrl.currentCategoryId = category.id; frontCtrl.currentCategoryName = category.category_name">
+              Explore
+              <svg xmlns="http://www.w3.org/2000/svg" width="0.6em" height="1.2em" viewBox="0 0 12 24" class="ml-1">
+                <path fill="currentColor" fill-rule="evenodd" d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <blockquote class="blockquote text-center mt-5 mb-5" ng-if="frontCtrl.currentCategoryId">
+      <h3 style="font-family: Arial, Helvetica, sans-serif; font-weight: 600;">Products For {{frontCtrl.currentCategoryName}}</h3>
+    </blockquote>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" ng-if="frontCtrl.products.length > 0">
+      <div class="col mb-4" ng-repeat="product in frontCtrl.products">
+        <div class="card h-100">
+          <img class="card-img-top" ng-src="{{frontCtrl.getImageUrl(product.product_image)}}" alt="{{product.product_name}}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i>{{product.product_name}}</i></h5>
+            <p class="card-text"><strong>Price: Rs.{{product.price_by_quantity}}</strong></p>
+            <button class="btn mt-auto" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" ng-click="frontCtrl.addToCart(product)">
+              Add To Cart
+              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.3em" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2zm-8.9-5h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4l-3.87 7H8.53L4.27 2H1v2h2l3.6 7.59l-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
