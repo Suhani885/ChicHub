@@ -1,5 +1,5 @@
-<div class="container py-5 h-100" ng-controller="RegController as regCtrl" >
-  <div class="row d-flex justify-content-center align-items-center h-100">
+<div class="container py-5 h-100 mt-3" ng-controller="RegController as regCtrl" >
+  <div class="row d-flex justify-content-center align-items-center mt-5 h-100">
     <div class="col-xl-10" >
       <div class="card rounded-3 text-black">
         <div class="row g-0">
@@ -27,7 +27,7 @@
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-3">
-                  <input type="text" pattern="[a-zA-Z]+" maxlength="20" ng-model="regCtrl.lname" class="form-control" placeholder="Last name" autocomplete="on" />
+                  <input type="text" pattern="[a-zA-Z]+" maxlength="20" ng-model="regCtrl.lname" class="form-control" placeholder="Last name (Optional)" autocomplete="on" />
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-3">
@@ -35,7 +35,7 @@
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-3">
-                  <input class="form-control" placeholder="Phone Number" type="text" ng-model="regCtrl.number" autocomplete="on" pattern="[6 7 8 9][0-9]{9}"/>
+                  <input class="form-control" placeholder="Phone Number (Optional)" type="text" ng-model="regCtrl.number" autocomplete="on" pattern="[6 7 8 9][0-9]{9}"/>
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-3">

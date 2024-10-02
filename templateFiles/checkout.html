@@ -4,17 +4,17 @@
       <div class="row">
           <div class="col-md-6 mb-3">
               <label for="firstName">First name</label>
-              <input type="text" class="form-control" id="firstName" ng-model="checkoutCtrl.orderDetails.firstName" pattern="[a-zA-Z]+" maxlength="20" required autocomplete="on">
+              <input type="text" class="form-control" id="firstName" ng-model="checkoutCtrl.orderDetails.first_name" pattern="[a-zA-Z]+" maxlength="20" required autocomplete="on">
           </div>
           <div class="col-md-6 mb-3">
-              <label for="lastName">Last name</label>
-              <input type="text" class="form-control" id="lastName" ng-model="checkoutCtrl.orderDetails.lastName" pattern="[a-zA-Z]+" maxlength="20" autocomplete="on" required>
+              <label for="lastName">Last name (Optional)</label>
+              <input type="text" class="form-control" id="lastName" ng-model="checkoutCtrl.orderDetails.last_name" pattern="[a-zA-Z]+" maxlength="20" autocomplete="on">
           </div>
       </div>
 
       <div class="mb-3">
           <label for="number">Phone Number</label>
-          <input type="text" class="form-control" pattern="[6 7 8 9][0-9]{9}" autocomplete="on" id="number" ng-model="checkoutCtrl.orderDetails.number" required>
+          <input type="text" class="form-control" pattern="[6 7 8 9][0-9]{9}" autocomplete="on" id="number" ng-model="checkoutCtrl.orderDetails.phone_number" required>
       </div>
 
       <div class="mb-3">
@@ -36,7 +36,7 @@
           </div>
           <div class="col-md-4 mb-3">
               <label for="pin">Pincode</label>
-              <input type="text" class="form-control" id="pin" pattern="[1-9][0-9]{5}" ng-model="checkoutCtrl.orderDetails.pin" required>
+              <input type="text" class="form-control" id="pin" pattern="[1-9][0-9]{5}" ng-model="checkoutCtrl.orderDetails.pin_code" required>
           </div>
       </div>
 
@@ -46,15 +46,15 @@
 
       <div class="d-block my-3">
           <div class="custom-control custom-radio">
-              <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="credit" required>
+              <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.payment_method" value="credit" required>
               <label class="custom-control-label" for="credit">Credit card</label>
           </div>
           <div class="custom-control custom-radio">
-              <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="debit" required>
+              <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.payment_method" value="debit" required>
               <label class="custom-control-label" for="debit">Debit card</label>
           </div>
           <div class="custom-control custom-radio">
-              <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.paymentMethod" value="paypal" required>
+              <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" ng-model="checkoutCtrl.orderDetails.payment_method" value="paypal" required>
               <label class="custom-control-label" for="paypal">PayPal</label>
           </div>
       </div>

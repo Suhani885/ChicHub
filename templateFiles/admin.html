@@ -1,13 +1,14 @@
-<div ng-controller="AdminController as admCtrl">
-    <nav class="navbar sticky-top navbar-light bg-white shadow-sm">
+<div ng-controller="AdminController as admCtrl" style="font-family:'Times New Roman', Times, serif;">
+    <nav class="navbar sticky-top navbar-light d-flex bg-white shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="images/logo.jpeg" width="100" alt="logo">
+                <img src="images/logo.jpeg" width="110" alt="logo">
             </a>
+            <div style="color: #8968CD;"><h2>USER DETAILS</h2></div>
             <div class="d-flex">
-                <button class="btn btn-outline-primary me-2" ui-sref="admin">Dashboard</button>
-                <button class="btn btn-outline-primary me-2" ui-sref="category">Categories</button>
-                <button class="btn btn-outline-primary me-2" ui-sref="order">Order Details</button>
+                <button class="btn me-2" ui-sref="admin" style="color: #6a1b9a; border-color: #6a1b9a;">Users</button>
+                <button class="btn me-2" ui-sref="category" style="color: #6a1b9a; border-color: #6a1b9a;">Categories</button>
+                <button class="btn me-2" ui-sref="order" style="color: #6a1b9a; border-color: #6a1b9a;">Orders</button>
                 <button ng-click="admCtrl.logout()" class="btn btn-outline-danger" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="1.6em" height="1.6em" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h7v2H5v14h7v2zm11-4l-1.375-1.45l2.55-2.55H9v-2h8.175l-2.55-2.55L16 7l5 5z"/></svg>
                     Logout
@@ -16,11 +17,11 @@
         </div>
     </nav>
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4 d-flex flex-wrap">
         <div class="row">
             <div class="col-12 mb-4">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white" style="background-color: #8968CD;">
                         <h4 class="mb-0">Admin Management</h4>
                     </div>
                     <div class="card-body">
@@ -58,7 +59,7 @@
 
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header text-white"style="background-color: #8968CD;">
                         <h4 class="mb-0">User Management</h4>
                     </div>
                     <div class="card-body">
