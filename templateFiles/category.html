@@ -3,10 +3,10 @@
         <div class="navbar-brand">
             <img src="images/logo.jpeg" width="110" alt="logo">
         </div>
-        <div style="color: #8968CD;"><h2>CATEGORY DETAILS</h2></div>
+        <div style="color: #8968CD;"><h2>PRODUCT DETAILS</h2></div>
         <div>
             <button class="btn me-2" ui-sref="admin" style="color: #6a1b9a; border-color: #6a1b9a;">Users</button>
-            <button class="btn me-2" ui-sref="category" style="color: #6a1b9a; border-color: #6a1b9a;">Categories</button>
+            <button class="btn me-2" ui-sref="category" style="color: #6a1b9a; border-color: #6a1b9a;">Products</button>
             <button class="btn me-2" ui-sref="order" style="color: #6a1b9a; border-color: #6a1b9a;">Orders</button>
         </div>
     </nav>
@@ -58,8 +58,8 @@
                                         <td>{{category.category_name}}</td>
                                         <td>{{category.category_description | limitTo: 40}}{{category.category_description.length > 40 ? '...' : ''}}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary me-1" ng-click="categCtrl.fetchProducts(category); categCtrl.currentCategoryId = category.id; categCtrl.currentCategoryName = category.category_name">View Products</button>
-                                            <button class="btn btn-sm btn-danger" ng-click="categCtrl.deleteCategory(category.id)">Delete</button>
+                                            <button class="btn btn-sm btn-primary me-1 mb-1" ng-click="categCtrl.fetchProducts(category); categCtrl.currentCategoryId = category.id; categCtrl.currentCategoryName = category.category_name">View Products</button>
+                                            <button class="btn btn-sm btn-danger ml-3" ng-click="categCtrl.deleteCategory(category.id)">Delete</button>
                                         </td>
                                     </tr>
                                 </tbody>

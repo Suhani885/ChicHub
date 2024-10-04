@@ -1,43 +1,57 @@
-<div ng-controller="LandingController as landingCtrl" class="container-fluid">
+<div ng-controller="LandingController as landingCtrl" style="font-family: 'Arial', sans-serif;">
+    <nav class="navbar justify-content-between px-4">
+        <a class="navbar-brand">
+            <img src="images/ChicHub.png" width="170" height="80" alt="ChicHub logo">
+        </a>
+        <form>
+            <a ui-sref="cart"><button class="btn my-2 my-sm-0" ><svg xmlns="http://www.w3.org/2000/svg" width="1.8em" height="1.8em" viewBox="0 0 24 24"><path fill="#6862ab" d="M17 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M1 2v2h2l3.6 7.59l-1.36 2.45c-.15.28-.24.61-.24.96a2 2 0 0 0 2 2h12v-2H7.42a.25.25 0 0 1-.25-.25q0-.075.03-.12L8.1 13h7.45c.75 0 1.41-.42 1.75-1.03l3.58-6.47c.07-.16.12-.33.12-.5a1 1 0 0 0-1-1H5.21l-.94-2M7 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2"/></svg></button></a>
+            <button ng-if="!landingCtrl.isLoggedIn" ui-sref="login" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" class="btn my-2 my-sm-0" type="button">Login</button>
+            <button ng-if="landingCtrl.isLoggedIn" ng-click="landingCtrl.logout()" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" class="btn my-2 my-sm-0" type="button">Logout</button>
+          </form>
+    </nav>
 
-    <nav class="navbar justify-content-between">
-      <a class="navbar-brand">
-        <img src="images/ChicHub.png" width="170" height="80" alt="logo">
-      </a>
-      <form class="form-inline" ng-submit="landingCtrl.search()">
-        <input style="width: 450px;" class="form-control mr-sm-2" type="search" placeholder="Find your favourite jewelleries..." aria-label="Search" ng-model="landingCtrl.searchQuery" ng-change="landingCtrl.search()">
-        <button style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" class="btn  my-2 my-sm-0" type="submit">Search</button>
-      </form>
-      <form>
-        <a ui-sref="cart"><button class="btn my-2 my-sm-0" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;">Cart</button></a>
-        <a ui-sref="login"><button class="btn my-2 my-sm-0" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;">SignIn</button></a>
-      <button style="background-color: #6862ab; color: white; border: 1px solid #6862ab;" ng-click="landingCtrl.logout()" class="btn my-2 my-sm-0" type="submit">Logout</button>
-      </form>
-    </nav> 
+    <div class="container-fluid" style="background-color: #f7f6fa; min-height: calc(100vh - 100px);">
+        <div class="row py-5">
+            <div class="col-md-6 d-flex align-items-center">
+                <div class="px-4">
+                    <h1 style="color: #4a4494; font-size: 3rem; font-weight: bold;">Discover Timeless Elegance</h1>
+                    <p class="mt-4" style="color: #666; font-size: 1.2rem;">Experience our exquisite collection of handcrafted jewellery, where every piece tells a unique story. From classic designs to contemporary masterpieces, find the perfect accessory to express your style.</p>
+                    <a ui-sref="main"><button class="btn btn-lg mt-4" style="background-color: #6862ab; color: white; border: 1px solid #6862ab;">Shop Now</button></a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <img src="images/image.jpeg" class="img-fluid rounded" alt="Jewellery showcase">
+            </div>
+        </div>
 
-    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-          <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-          <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-          <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-          <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
-      </ol>
-      <div class="carousel-inner">
-          <div class="carousel-item active">
-              <img class="d-block w-100" src="images/img2.jpeg" alt="First slide">
-          </div>
-          <div class="carousel-item">
-              <img class="d-block w-100" src="images/img9.jpeg" alt="Second slide">
-          </div>
-          <div class="carousel-item">
-              <img class="d-block w-100" src="images/img3.jpeg" alt="Third slide">
-          </div>
-          <div class="carousel-item">
-              <img class="d-block w-100" src="images/img1.jpeg" alt="Fourth slide">
-          </div>
-      </div>
-  </div>
-
+        <div class="row py-5 px-4">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border: none; background-color: white;">
+                    <div class="card-body text-center">
+                        <i class="fas fa-gem mb-3" style="color: #6862ab; font-size: 2rem;"></i>
+                        <h5 class="card-title" style="color: #4a4494;">Premium Quality</h5>
+                        <p class="card-text" style="color: #666;">Each piece is crafted with the finest materials and attention to detail.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border: none; background-color: white;">
+                    <div class="card-body text-center">
+                        <i class="fas fa-truck mb-3" style="color: #6862ab; font-size: 2rem;"></i>
+                        <h5 class="card-title" style="color: #4a4494;">Free Shipping</h5>
+                        <p class="card-text" style="color: #666;">Enjoy free shipping on all orders over Rs.1000.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100" style="border: none; background-color: white;">
+                    <div class="card-body text-center">
+                        <i class="fas fa-award mb-3" style="color: #6862ab; font-size: 2rem;"></i>
+                        <h5 class="card-title" style="color: #4a4494;">Lifetime Warranty</h5>
+                        <p class="card-text" style="color: #666;">Our commitment to quality comes with a lifetime warranty on all pieces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-  
-  

@@ -1,5 +1,5 @@
 const chichub = angular.module('chichub', ['ui.router']);
-var baseUrl = 'https://10.21.96.172:8000';
+var baseUrl = 'https://10.21.96.33:8000';
 
 chichub.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider, $stateProvider) {
     $urlRouterProvider.otherwise('/login');
@@ -39,6 +39,12 @@ chichub.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvi
             templateUrl: 'templateFiles/landingPage.html',
             controller: 'LandingController',
             controllerAs: 'landingCtrl'
+        })
+        .state('orders', {
+            url: '/orders',
+            templateUrl: 'templateFiles/orderHist.html',
+            controller: 'OrderHistoryController',
+            controllerAs: 'ordersCtrl'
         })
         .state('checkout', {
             url: '/checkout',
@@ -91,7 +97,7 @@ chichub.controller('RegController', ['$http', '$state', function ($http, $state)
                 $state.go('login');
             });
         }, function(error) {
-            regCtrl.errorMessage = error.data.message || "An unexpected error occurred";
+            regCtrl.errorMessage = error.data.message || "An unexpected error occurred. PLease try again!!!";
             console.log("error", error);
             Swal.fire({
                 icon: 'error',
@@ -104,6 +110,27 @@ chichub.controller('RegController', ['$http', '$state', function ($http, $state)
 
 chichub.controller('LoginController', ['$http', '$state', function ($http, $state) {
     var loginCtrl = this;
+    loginCtrl.email = '';
+    loginCtrl.password = '';
+    
+    loginCtrl.checkSession = function() {
+        var req = {
+            method: 'GET',
+            url: `${baseUrl}/accounts/login/`,
+            withCredentials: true
+        };
+
+        $http(req).then(function(response) {
+            console.log("Session check response:", response);
+            if (response.data.message === "Super user is already logged in") {
+                $state.go('admin');
+            } else if (response.data.message === "Normal user is already logged in") {
+                $state.go('main');
+            }
+        }, function(error) {
+            console.log("Session check failed", error);
+        });
+    };
 
     loginCtrl.login = function() {
         console.log(loginCtrl.email, loginCtrl.password);
@@ -124,6 +151,7 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
             $http(req).then(function(response) {
                 console.log(response);
                 if (response.data.message === "Super user is authenticated") {
+                    sessionStorage.setItem('email', loginCtrl.email);
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -132,12 +160,13 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
                         $state.go('admin');
                     });
                 } else {
+                    sessionStorage.setItem('email', loginCtrl.email);
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
                         text: 'User Login Successful'
                     }).then(() => {
-                        $state.go('main');
+                        $state.go('landing');
                     });
                 }
             }, function(error) { 
@@ -158,8 +187,8 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
             });
         }
     };
+    loginCtrl.checkSession();
 }]);
-
 
 chichub.controller('AdminController', ['$http', '$state', function ($http, $state) {
     var admCtrl = this;
@@ -180,12 +209,20 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
             console.log(response.data.NormalUserDetails);
         }, function(error) {
             console.log("Error", error);
-            Swal.fire(
-                'Error',
-                error.data.message || 'Authentication Required. Please login as a superuser to access the page!!!',
-                'error'
-            );
-            $state.go('login');
+            if(error.data.message==="Super user login is required !!!"){
+                Swal.fire(
+                    'Error',
+                    error.data.message,
+                    'error'
+                );
+                $state.go('login');
+            } else {
+                Swal.fire(
+                    'Error',
+                    error.data.message,
+                    'error'
+                );
+            }
         });
     };
             
@@ -220,7 +257,7 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
                     console.error(error);
                     Swal.fire(
                         'Failed!',
-                        error.data.message || 'Failed to make user an admin.',
+                        error.data.message || 'Failed to make user an admin!',
                         'error'
                     );
                 });
@@ -297,7 +334,7 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
                     console.log("error", error);
                     Swal.fire(
                         'Error!',
-                        error.data.message || 'Failed to log out. Please try again.',
+                        error.data.message || 'Failed to log out. Please try again!',
                         'error'
                     );
                 });
@@ -311,51 +348,57 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
 chichub.controller('MainController', ['$http','$state', function($http,$state) {
     var mainCtrl = this;
     mainCtrl.categories = [];
-    mainCtrl.allProducts = []; 
     mainCtrl.products = [];
     mainCtrl.currentCategoryId = null;
     mainCtrl.currentCategoryName = null;
+    mainCtrl.allProducts = []; 
     mainCtrl.searchQuery = ''; 
     mainCtrl.searchResults = [];
-    mainCtrl.showSearchResults = false;
+    mainCtrl.isLoggedIn = false;
+    mainCtrl.loading = true;
+
+    mainCtrl.checkLoginStatus = function() {
+        mainCtrl.isLoggedIn = !!sessionStorage.getItem('email');
+    };
 
     mainCtrl.logout = function() {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You will be logged out of your account.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, log out!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var req = {
-                            method: 'POST',
-                            url: `${baseUrl}/accounts/logout/`,
-                            withCredentials: true
-                        };
-                        $http(req).then(function(response) {
-                            console.log(response);
-                            sessionStorage.removeItem('email');
-                            Swal.fire(
-                                'Logged Out!',
-                                'You have been successfully logged out.',
-                                'success'
-                            ).then(() => {
-                                $state.go('login');
-                            });
-                        }, function(error) {
-                            console.log("error", error);
-                            Swal.fire(
-                                'Error',
-                                error.data.message || 'Failed to log out. Please try again.',
-                                'error'
-                            );
-                        });
-                    }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of your account.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log out!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var req = {
+                    method: 'POST',
+                    url: `${baseUrl}/accounts/logout/`,
+                    withCredentials: true
+                };
+                $http(req).then(function(response) {
+                    console.log(response);
+                    sessionStorage.removeItem('email');
+                    mainCtrl.isLoggedIn = false; 
+                    Swal.fire(
+                        'Logged Out!',
+                        'You have been successfully logged out.',
+                        'success'
+                    ).then(() => {
+                        $state.go('login');
+                    });
+                }, function(error) {
+                    console.log("error", error);
+                    Swal.fire(
+                        'Error',
+                        error.data.message || 'Failed to log out. Please try again.',
+                        'error'
+                    );
                 });
-            };
+            }
+        });
+    };
 
     mainCtrl.getImageUrl = function(imagePath) {
                 return baseUrl + '/media/' + imagePath;
@@ -408,9 +451,10 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
                         text:  error.data.message || 'Failed to add product to cart. Please try again!' ,
                     });
                 });
-    };
+            };
 
     mainCtrl.fetchCategories = function() {
+        mainCtrl.loading = true;
         var req = {
             method: 'GET',
             url: `${baseUrl}/store-app/categories/`,
@@ -419,8 +463,15 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
         $http(req).then(function(response) {
             console.log(response);
             mainCtrl.categories = response.data.Category_Details;
+            mainCtrl.loading = false;
         }, function(error) {
             console.error('Error fetching categories:', error);
+            mainCtrl.loading = false;
+            Swal.fire(
+                'Error',
+                error.data.message || 'Failed to fetch categories',
+                'error'
+            );
         });
     };
 
@@ -431,7 +482,8 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
             withCredentials: true
         };
         $http(req).then(function(response) {
-            mainCtrl.products = response.data.Product_Details;
+            mainCtrl.allProducts = response.data.Products_all;
+            mainCtrl.search(); 
         }, function(error) {
             console.error('Error fetching products:', error);
         });
@@ -439,17 +491,18 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
 
     mainCtrl.search = function() {
         if (mainCtrl.searchQuery.length > 0) {
-            mainCtrl.searchResults = mainCtrl.products.filter(function(product) {
+            mainCtrl.searchResults = mainCtrl.allProducts.filter(function(product) {
                 return product.product_name.toLowerCase().includes(mainCtrl.searchQuery.toLowerCase()) ||
                        (product.description && product.description.toLowerCase().includes(mainCtrl.searchQuery.toLowerCase()));
             });
         } else {
-            mainCtrl.searchResults = [];
+            mainCtrl.searchResults = []; 
         }
     };
 
-    mainCtrl.fetchCategories();
+    mainCtrl.checkLoginStatus();
     mainCtrl.fetchAllProducts();
+    mainCtrl.fetchCategories();
 }]); 
 
 chichub.controller('CategController', ['$http', function($http) {
@@ -526,6 +579,7 @@ chichub.controller('CategController', ['$http', function($http) {
             });
             categCtrl.fetchCategories();
             categCtrl.newCategory = {};
+            document.getElementById('category-image').value = '';
         }, function(error) {
             console.error('Error adding category:', error);
             Swal.fire({
@@ -571,6 +625,7 @@ chichub.controller('CategController', ['$http', function($http) {
             });
             categCtrl.fetchProducts({id: categCtrl.currentCategoryId});
             categCtrl.newProduct = {};
+            document.getElementById('product-image').value = '';
         }, function(error) {
             console.error('Error adding product:', error);
             Swal.fire({
@@ -693,7 +748,7 @@ chichub.controller('CartController', ['$http','$state', function($http,$state) {
                 } else {
                     Swal.fire(
                         'Error',
-                        error.data.message || 'Failed to fetch cart details. Please try again.',
+                        error.data.message || 'Failed to fetch cart details. Please try again!',
                         'error'
                     );
                 }
@@ -736,7 +791,7 @@ chichub.controller('CartController', ['$http','$state', function($http,$state) {
             console.error('Error updating quantity:', error);
             Swal.fire(
                 'Failed!',
-                error.data.message || 'Failed to update quantity. Please try again.',
+                error.data.message || 'Failed to update quantity. Please try again!',
                 'error'
             );
         });
@@ -776,7 +831,7 @@ chichub.controller('CartController', ['$http','$state', function($http,$state) {
                     console.error('Error removing item from cart:', error);
                     Swal.fire(
                         'Failed!',
-                        error.data.message || 'Failed to remove item from cart. Please try again.',
+                        error.data.message || 'Failed to remove item from cart. Please try again!',
                         'error'
                     );
                 });
@@ -787,7 +842,7 @@ chichub.controller('CartController', ['$http','$state', function($http,$state) {
     cartCtrl.fetchCart();
 }]);
 
-chichub.controller('CheckoutController', ['$http', function($http) {
+chichub.controller('CheckoutController', ['$http','$state', function($http,$state) {
     var checkoutCtrl = this;
     checkoutCtrl.cartItems = [];
     checkoutCtrl.total = 0;
@@ -841,11 +896,12 @@ chichub.controller('CheckoutController', ['$http', function($http) {
                 icon: 'success',
                 confirmButtonText: 'OK'
             });
+            $state.go('main');
         }, function(error) {
             console.error('Error placing order:', error);
             Swal.fire(
                 'Error',
-                error.data.message || 'Failed to place order. Please try again.',
+                error.data.message || 'Failed to place order. Please try again!',
                 'error'
             );
         });
@@ -867,7 +923,7 @@ chichub.controller('CheckoutController', ['$http', function($http) {
             console.error('Error fetching cart:', error);
             Swal.fire(
                 'Error',
-                error.data.message || 'Failed to fetch cart details. Please try again.',
+                error.data.message || 'Failed to fetch cart details. Please try again!',
                 'error'
             );
         });
@@ -876,13 +932,115 @@ chichub.controller('CheckoutController', ['$http', function($http) {
     checkoutCtrl.fetchCart();
 }]);
 
+chichub.controller('LandingController', ['$http','$state', function($http,$state) {
+    var landingCtrl = this;
+    landingCtrl.isLoggedIn = false;
 
+    landingCtrl.checkLoginStatus = function() {
+        landingCtrl.isLoggedIn = !!sessionStorage.getItem('email');
+    };
 
+    landingCtrl.logout = function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of your account.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log out!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var req = {
+                    method: 'POST',
+                    url: `${baseUrl}/accounts/logout/`,
+                    withCredentials: true
+                };
+                $http(req).then(function(response) {
+                    console.log(response);
+                    sessionStorage.removeItem('email');
+                    landingCtrl.isLoggedIn = false; 
+                    Swal.fire(
+                        'Logged Out!',
+                        'You have been successfully logged out.',
+                        'success'
+                    ).then(() => {
+                        $state.go('login');
+                    });
+                }, function(error) {
+                    console.log("error", error);
+                    Swal.fire(
+                        'Error',
+                        error.data.message || 'Failed to log out. Please try again.',
+                        'error'
+                    );
+                });
+            }
+        });
+    };
 
+    landingCtrl.checkLoginStatus();
+}]); 
 
+chichub.controller('OrderHistoryController', ['$http', function($http) {
+    var ordersCtrl = this;
+    ordersCtrl.orders = [];
+    ordersCtrl.loading = true;
+    ordersCtrl.error = null;
 
+    ordersCtrl.fetchOrders = function() {
+        ordersCtrl.loading = true;
+        ordersCtrl.error = null;
+        
+        var req = {
+            method: 'GET',
+            url: `${baseUrl}/store-app/order-details/`,
+            withCredentials: true
+        };
 
+        $http(req).then(function(response) {
+            console.log(response);
+            ordersCtrl.orders = response.data.Order_Details || [];
+            ordersCtrl.loading = false;
+        }, function(error) {
+            console.log("Error", error);
+            ordersCtrl.error = 'Failed to load orders.';
+            ordersCtrl.loading = false;
+            Swal.fire(
+                'Error',
+                error.data.message || 'Failed to fetch orders',
+                'error'
+            );
+        });
+    };
 
+    ordersCtrl.fetchOrders();
+}]);
 
+chichub.controller('OrderController', ['$http', function($http) {
+    var orderCtrl = this;
+    orderCtrl.orders = [];
 
+    orderCtrl.fetchOrders = function() {
 
+        var req = {
+            method: 'GET',
+            url: `${baseUrl}/store-app/order-details/`,
+            withCredentials: true
+        };
+
+        $http(req).then(function(response) {
+            console.log(response);
+            orderCtrl.orders = response.data.Order_Details || [];
+        }, function(error) {
+            console.log("Error", error);
+            Swal.fire(
+                'Error',
+                error.data.message || 'Failed to fetch orders',
+                'error'
+            );
+        });
+    };
+
+    orderCtrl.fetchOrders();
+}]);
