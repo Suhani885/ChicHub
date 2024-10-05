@@ -8,6 +8,10 @@
             <button class="btn me-2" ui-sref="admin" style="color: #6a1b9a; border-color: #6a1b9a;">Users</button>
             <button class="btn me-2" ui-sref="category" style="color: #6a1b9a; border-color: #6a1b9a;">Products</button>
             <button class="btn me-2" ui-sref="order" style="color: #6a1b9a; border-color: #6a1b9a;">Orders</button>
+            <button ng-click="orderCtrl.logout()" class="btn btn-outline-danger" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.6em" height="1.6em" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h7v2H5v14h7v2zm11-4l-1.375-1.45l2.55-2.55H9v-2h8.175l-2.55-2.55L16 7l5 5z"/></svg>
+                Logout
+            </button>
         </div>
     </nav>
 
@@ -24,21 +28,36 @@
                                 <thead>
                                     <tr>
                                         <th>Order ID</th>
-                                        <th>Customer</th>
-                                        <th>Date</th>
-                                        <th>Price</th>
-                                        <th>Product</th>
-                                        <th>Status</th>
+                                        <th>Customer Name</th>
+                                        <th>Phone Number</th>
+                                        <th>Address</th>
+                                        <th>Order Date</th>
+                                        <th>Total Price</th>
+                                        <th>Payment Method</th>
+                                        <!-- <th>Status</th> -->
+                                        <th>Products</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="order in orderCtrl.orders">
-                                        <td>{{order.order_id_id}}</td>
-                                        <td>{{order.customer_name}}</td>
+                                        <td>{{order.id}}</td>
+                                        <td>{{order.first_name}} {{order.last_name}}</td>
+                                        <td>{{order.phone_number}}</td>
+                                        <td>{{order.address}}, {{order.city}}, {{order.state}} - {{order.pin_code}}</td>
                                         <td>{{order.order_date}}</td>
                                         <td>Rs.{{order.total_price}}</td>
-                                        <td>{{order.product}}</td>
-                                        <td>{{ order.status === 'P' ? 'Delivered' : 'Not Delivered' }}</td>
+                                        <td>{{order.payment_method}}</td>
+                                        <!-- <td>
+                                            <span ng-if="order.order_status === 'P'" class="badge bg-success">Not Delivered</span>
+                                            <span ng-if="order.order_status !== 'P'" class="badge bg-warning">Delivered</span>
+                                        </td> -->
+                                        <td>
+                                            <ul class="list-unstyled m-0">
+                                                <li ng-repeat="product in order.detailed_product_list">
+                                                    {{product.product_name}} (Qty: {{product.quantity}})
+                                                </li>
+                                            </ul>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -49,4 +68,3 @@
         </div>
     </div>
 </div>
-    

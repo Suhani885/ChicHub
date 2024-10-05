@@ -14,19 +14,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="item in cartCtrl.cartItems">
+                            <tr ng-repeat="item in cartCtrl.cartDetails.Detailed_Product_List">
                                 <td data-th="Product">
                                     <div class="row">
                                         <div class="col-md-3 text-left">
                                             <img ng-src="{{cartCtrl.getImageUrl(item.product_image)}}" alt="{{item.name}}" style="width: 50px; height: 50px; object-fit: cover;">
                                         </div>
                                         <div class="col-md-9 text-left mt-sm-2">
-                                            <h4>{{item.name}}</h4>
-                                            <p class="font-weight-light">{{item.description}}</p>
+                                            <h4>{{item.product_name}}</h4>
+                                            <!-- <p class="font-weight-light">{{item.product_description}}</p> -->
                                         </div>
                                     </div>
                                 </td>
-                                <td data-th="Price">Rs.{{item.price_by_quantity}}</td>
+                                <td data-th="Price">Rs.{{item.product_price}}</td>
                                 <td data-th="Quantity">
                                     <input type="number" class="form-control form-control-lg text-center" ng-model="item.quantity" ng-change="cartCtrl.updateQuantity(item)" min="1">
                                 </td>

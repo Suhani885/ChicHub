@@ -4,36 +4,41 @@
         <div class="spinner-border" style="color: #6f42c1;" role="status"></div>
     </div>
     <div class="alert alert-danger" ng-if="ordersCtrl.error">
-        {{ orderCtrl.error }}
+        {{ ordersCtrl.error }}
     </div>
     <div class="row" ng-if="!ordersCtrl.loading && !ordersCtrl.error">
         <div class="col-12 text-center" ng-if="ordersCtrl.orders.length === 0">
             <h4 class="text-muted">No orders found</h4>
         </div>
         <div class="col-12 mb-4" ng-repeat="order in ordersCtrl.orders">
-            <div class="card shadow-sm" style="border-left: 4px solid #6f42c1;">
+            <div class="card shadow-sm mb-3" style="border-left: 4px solid #6f42c1;">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span class="fw-bold" style="color: #6f42c1;">Order Id #{{ order.order_id_id }}</span>
+                    <span class="fw-bold" style="color: #6f42c1;">Order Id #{{ order.id }}</span>
                     <span class="text-muted">Ordered on: {{ order.order_date }}</span>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-2">
-                            <img ng-src="{{ order.productImage }}" class="img-fluid rounded" alt="{{ order.productName }}" 
-                                 style="max-width: 150px;">
+                        <div class="col-md-3 text-md-end mb-3">
+                            <h5 class="mb-2">Total: Rs.{{ order.total_price }}</h5>
+                            <!-- <button class="btn btn-sm"
+                                    ng-class="{'btn-secondary': order.order_status === 'Delivered'}"
+                                    ng-style="order.order_status !== 'Delivered' && {'background-color': '#6f42c1', 'color': 'white'}"
+                                    ng-disabled="order.order_status === 'Delivered'">
+                                {{ order.order_status === 'P' ? 'Not Delivered' : 'Delivered' }}
+                            </button> -->
                         </div>
-                        <div class="col-md-7">
-                            <h5 class="card-title" style="color: #6f42c1;">{{ order.productName }}</h5>
-                            <p class="card-text">{{ order.description }}</p>
-                        </div>
-                        <div class="col-md-3 text-md-end">
-                            <h5 class="mb-3">Rs.{{ order.total_price }}</h5>
-                            <button class="btn btn-sm mb-2" 
-                                    ng-class="{'btn-secondary': order.status === 'Delivered'}"
-                                    ng-style="order.status !== 'Delivered' && {'background-color': '#6f42c1', 'color': 'white'}"
-                                    ng-disabled="order.status === 'Delivered'">
-                                {{ order.status === 'P' ? 'Delivered' : 'Not Delivered' }}
-                            </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3" ng-repeat="product in order.detailed_product_list">
+                            <div class="card h-100">
+                                <img ng-src="{{ordersCtrl.getImageUrl(product.product_image)}}" alt="{{product.product_name}}" class="card-img-top" 
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="color: #6f42c1;">{{ product.product_name }}</h5>
+                                    <p class="card-text"><strong>Price:</strong> Rs.{{ product.product_price }}</p>
+                                    <p class="card-text"><strong>Quantity:</strong> {{ product.quantity }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -48,3 +53,4 @@
         </div>
     </div>
 </div>
+

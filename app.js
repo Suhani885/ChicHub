@@ -1,5 +1,5 @@
 const chichub = angular.module('chichub', ['ui.router']);
-var baseUrl = 'https://10.21.96.33:8000';
+var baseUrl = 'https://10.21.96.85:8000';
 
 chichub.config(['$urlRouterProvider', '$stateProvider', function($urlRouterProvider, $stateProvider) {
     $urlRouterProvider.otherwise('/login');
@@ -125,7 +125,7 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
             if (response.data.message === "Super user is already logged in") {
                 $state.go('admin');
             } else if (response.data.message === "Normal user is already logged in") {
-                $state.go('main');
+                $state.go('landing');
             }
         }, function(error) {
             console.log("Session check failed", error);
@@ -150,21 +150,19 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
 
             $http(req).then(function(response) {
                 console.log(response);
-                if (response.data.message === "Super user is authenticated") {
-                    sessionStorage.setItem('email', loginCtrl.email);
+                if (response.data.message === "Owner is authenticated" || "Admin is authenticated") {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
-                        text: 'Superuser login successful'
+                        text: response.data.message
                     }).then(() => {
                         $state.go('admin');
                     });
                 } else {
-                    sessionStorage.setItem('email', loginCtrl.email);
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
-                        text: 'User Login Successful'
+                        text: 'User login successful'
                     }).then(() => {
                         $state.go('landing');
                     });
@@ -193,6 +191,7 @@ chichub.controller('LoginController', ['$http', '$state', function ($http, $stat
 chichub.controller('AdminController', ['$http', '$state', function ($http, $state) {
     var admCtrl = this;
     admCtrl.superusers = [];
+    admCtrl.admins = [];
     admCtrl.users = [];
 
     admCtrl.fetchUsers = function() {
@@ -203,13 +202,15 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
         };
         $http(req).then(function(response) {
             console.log(response);
-            admCtrl.superusers = response.data.SuperUserDetails || [];
-            console.log(response.data.SuperUserDetails);
-            admCtrl.users = response.data.NormalUserDetails || [];
-            console.log(response.data.NormalUserDetails);
+            admCtrl.superusers = response.data.Owner_Details || [];
+            console.log(response.data.Owner_Details);
+            admCtrl.admins = response.data.Admin_Details || [];
+            console.log(response.data.Admin_Details);
+            admCtrl.users = response.data.Normal_User_Details || [];
+            console.log(response.data.Normal_User_Details);
         }, function(error) {
             console.log("Error", error);
-            if(error.data.message==="Super user login is required !!!"){
+            if(error.data.message==="Admin or Owner login is required !"){
                 Swal.fire(
                     'Error',
                     error.data.message,
@@ -296,7 +297,46 @@ chichub.controller('AdminController', ['$http', '$state', function ($http, $stat
                     console.error(error);
                     Swal.fire(
                         'Failed!',
-                        error.data.message || 'You cannot delete the OWNER!',
+                        error.data.message ,
+                        'error'
+                    );
+                });
+            }
+        });
+    };
+
+    admCtrl.removeAdmin = function(userId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var req = {
+                    method: 'POST',
+                    url: `${baseUrl}/store-app/deassign-admin/`,
+                    withCredentials: true,
+                    data: {
+                        "id": userId
+                    }
+                };
+                $http(req).then(function(response) {
+                    console.log(response);
+                    Swal.fire(
+                        'Admin Removed!',
+                        'Admin has been made a user successfully.',
+                        'success'
+                    );
+                    admCtrl.fetchUsers();
+                }, function(error) {
+                    console.error(error);
+                    Swal.fire(
+                        'Failed!',
+                        error.data.message ,
                         'error'
                     );
                 });
@@ -354,55 +394,76 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
     mainCtrl.allProducts = []; 
     mainCtrl.searchQuery = ''; 
     mainCtrl.searchResults = [];
+    mainCtrl.selectedCategory = '';
     mainCtrl.isLoggedIn = false;
-    mainCtrl.loading = true;
 
-    mainCtrl.checkLoginStatus = function() {
-        mainCtrl.isLoggedIn = !!sessionStorage.getItem('email');
+mainCtrl.checkLoginStatus = function() {
+    var req = {
+        method: 'GET',
+        url: `${baseUrl}/accounts/login/`,
+        withCredentials: true
     };
+    
+    $http(req).then(function(response) {
+        console.log("Login status check response:", response);
+        if (response.data.message === "Super user is already logged in") {
+            mainCtrl.isLoggedIn = true;
+            $state.go('admin');
+        } else if (response.data.message === "Normal user is already logged in") {
+            mainCtrl.isLoggedIn = true;
+            $state.go('main');
+        } else {
+            mainCtrl.isLoggedIn = false;
+            $state.go('login');
+        }
+    }, function(error) {
+        console.error('Error checking login status:', error);
+        mainCtrl.isLoggedIn = false;
+        $state.go('login');
+    });
+};
 
-    mainCtrl.logout = function() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You will be logged out of your account.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, log out!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var req = {
-                    method: 'POST',
-                    url: `${baseUrl}/accounts/logout/`,
-                    withCredentials: true
-                };
-                $http(req).then(function(response) {
-                    console.log(response);
-                    sessionStorage.removeItem('email');
-                    mainCtrl.isLoggedIn = false; 
-                    Swal.fire(
-                        'Logged Out!',
-                        'You have been successfully logged out.',
-                        'success'
-                    ).then(() => {
-                        $state.go('login');
-                    });
-                }, function(error) {
-                    console.log("error", error);
-                    Swal.fire(
-                        'Error',
-                        error.data.message || 'Failed to log out. Please try again.',
-                        'error'
-                    );
+mainCtrl.logout = function() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out of your account.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log out!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var req = {
+                method: 'POST',
+                url: `${baseUrl}/accounts/logout/`,
+                withCredentials: true
+            };
+            $http(req).then(function(response) {
+                console.log(response);
+                mainCtrl.isLoggedIn = false;
+                Swal.fire(
+                    'Logged Out!',
+                    'You have been successfully logged out.',
+                    'success'
+                ).then(() => {
+                    $state.go('login');
                 });
-            }
-        });
-    };
+            }, function(error) {
+                console.log("error", error);
+                Swal.fire(
+                    'Error',
+                    error.data.message || 'Failed to log out. Please try again.',
+                    'error'
+                );
+            });
+        }
+    });
+};
 
-    mainCtrl.getImageUrl = function(imagePath) {
-                return baseUrl + '/media/' + imagePath;
-    };
+mainCtrl.getImageUrl = function(imagePath) {
+    return baseUrl + '/media/' + imagePath;
+};
 
     mainCtrl.fetchProducts = function(category) {
         mainCtrl.currentCategoryId = category.id;
@@ -441,7 +502,7 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
-                        text: 'Product added to cart successfully!',
+                        text: response.data.message
                     });
                 }, function(error) {
                     console.error('Error adding product to cart:', error);
@@ -454,7 +515,6 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
             };
 
     mainCtrl.fetchCategories = function() {
-        mainCtrl.loading = true;
         var req = {
             method: 'GET',
             url: `${baseUrl}/store-app/categories/`,
@@ -463,10 +523,8 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
         $http(req).then(function(response) {
             console.log(response);
             mainCtrl.categories = response.data.Category_Details;
-            mainCtrl.loading = false;
         }, function(error) {
             console.error('Error fetching categories:', error);
-            mainCtrl.loading = false;
             Swal.fire(
                 'Error',
                 error.data.message || 'Failed to fetch categories',
@@ -505,13 +563,14 @@ chichub.controller('MainController', ['$http','$state', function($http,$state) {
     mainCtrl.fetchCategories();
 }]); 
 
-chichub.controller('CategController', ['$http', function($http) {
+chichub.controller('CategController', ['$http','$state', function($http,$state) {
     var categCtrl = this;
     categCtrl.categories = [];
     categCtrl.newCategory = {};
     categCtrl.products = []; 
     categCtrl.newProduct = {};
     categCtrl.currentCategoryId = null;
+    categCtrl.selectedCategory = '';
 
     categCtrl.getImageUrl = function(imagePath) {
         return baseUrl + '/media/' + imagePath;
@@ -523,6 +582,44 @@ chichub.controller('CategController', ['$http', function($http) {
 
     categCtrl.productImg = function(element) {
         categCtrl.newProduct.image = element.files[0];
+    };
+
+    categCtrl.logout = function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You're about to log out!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log out!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var req = {
+                    method: 'POST',
+                    url: `${baseUrl}/accounts/logout/`,
+                    withCredentials: true
+                };
+                $http(req).then(function(response) {
+                    console.log(response);
+                    sessionStorage.removeItem('email');
+                    Swal.fire(
+                        'Logged Out!',
+                        'You have been successfully logged out.',
+                        'success'
+                    ).then(() => {
+                        $state.go('login');
+                    });
+                }, function(error) {
+                    console.log("error", error);
+                    Swal.fire(
+                        'Error!',
+                        error.data.message || 'Failed to log out. Please try again!',
+                        'error'
+                    );
+                });
+            }
+        });
     };
 
     categCtrl.fetchCategories = function() {
@@ -752,7 +849,6 @@ chichub.controller('CartController', ['$http','$state', function($http,$state) {
                         'error'
                     );
                 }
-                
             });
        
     };
@@ -864,7 +960,7 @@ chichub.controller('CheckoutController', ['$http','$state', function($http,$stat
         var orderData = {
             ...checkoutCtrl.orderDetails,
             cartItems: checkoutCtrl.cartItems,
-            total: checkoutCtrl.total
+            total: checkoutCtrl.total_price
         };
         var req = {
             method: 'POST',
@@ -917,7 +1013,7 @@ chichub.controller('CheckoutController', ['$http','$state', function($http,$stat
         $http(req).then(function(response) {
             console.log(response);
             checkoutCtrl.cartDetails = response.data.Cart_Details;
-            checkoutCtrl.total = checkoutCtrl.cartDetails.estimated_price;
+            checkoutCtrl.total = checkoutCtrl.cartDetails.total_price;
             checkoutCtrl.cartItems = checkoutCtrl.cartDetails.items || [];
         }, function(error) {
             console.error('Error fetching cart:', error);
@@ -988,6 +1084,10 @@ chichub.controller('OrderHistoryController', ['$http', function($http) {
     ordersCtrl.loading = true;
     ordersCtrl.error = null;
 
+    ordersCtrl.getImageUrl = function(imagePath) {
+        return baseUrl + '/media/' + imagePath;
+    };
+
     ordersCtrl.fetchOrders = function() {
         ordersCtrl.loading = true;
         ordersCtrl.error = null;
@@ -1000,7 +1100,7 @@ chichub.controller('OrderHistoryController', ['$http', function($http) {
 
         $http(req).then(function(response) {
             console.log(response);
-            ordersCtrl.orders = response.data.Order_Details || [];
+            ordersCtrl.orders = response.data.Order_Summary || [];
             ordersCtrl.loading = false;
         }, function(error) {
             console.log("Error", error);
@@ -1017,9 +1117,51 @@ chichub.controller('OrderHistoryController', ['$http', function($http) {
     ordersCtrl.fetchOrders();
 }]);
 
-chichub.controller('OrderController', ['$http', function($http) {
+chichub.controller('OrderController', ['$http','$state', function($http,$state) {
     var orderCtrl = this;
     orderCtrl.orders = [];
+
+    orderCtrl.getImageUrl = function(imagePath) {
+        return baseUrl + '/media/' + imagePath;
+    };
+
+    orderCtrl.logout = function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You're about to log out!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log out!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var req = {
+                    method: 'POST',
+                    url: `${baseUrl}/accounts/logout/`,
+                    withCredentials: true
+                };
+                $http(req).then(function(response) {
+                    console.log(response);
+                    sessionStorage.removeItem('email');
+                    Swal.fire(
+                        'Logged Out!',
+                        'You have been successfully logged out.',
+                        'success'
+                    ).then(() => {
+                        $state.go('login');
+                    });
+                }, function(error) {
+                    console.log("error", error);
+                    Swal.fire(
+                        'Error!',
+                        error.data.message || 'Failed to log out. Please try again!',
+                        'error'
+                    );
+                });
+            }
+        });
+    };
 
     orderCtrl.fetchOrders = function() {
 
@@ -1031,7 +1173,7 @@ chichub.controller('OrderController', ['$http', function($http) {
 
         $http(req).then(function(response) {
             console.log(response);
-            orderCtrl.orders = response.data.Order_Details || [];
+            orderCtrl.orders = response.data.Order_Summary || [];
         }, function(error) {
             console.log("Error", error);
             Swal.fire(

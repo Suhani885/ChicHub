@@ -4,10 +4,18 @@
             <img src="images/logo.jpeg" width="110" alt="logo">
         </div>
         <div style="color: #8968CD;"><h2>PRODUCT DETAILS</h2></div>
+        <select ng-model="categCtrl.selectedCategory" class="form-control mr-sm-2" style="width: 250px;color: #6a1b9a; border-color: #6a1b9a;">
+            <option value="" disabled selected>Filter Products By Category</option>
+            <option ng-repeat="category in categCtrl.categories" value="{{category.id}}" ng-click="categCtrl.fetchProducts(category);categCtrl.currentCategoryId = category.id; categCtrl.currentCategoryName = category.category_name" >{{category.category_name}}</option>
+        </select>
         <div>
             <button class="btn me-2" ui-sref="admin" style="color: #6a1b9a; border-color: #6a1b9a;">Users</button>
             <button class="btn me-2" ui-sref="category" style="color: #6a1b9a; border-color: #6a1b9a;">Products</button>
             <button class="btn me-2" ui-sref="order" style="color: #6a1b9a; border-color: #6a1b9a;">Orders</button>
+            <button ng-click="categCtrl.logout()" class="btn btn-outline-danger" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.6em" height="1.6em" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h7v2H5v14h7v2zm11-4l-1.375-1.45l2.55-2.55H9v-2h8.175l-2.55-2.55L16 7l5 5z"/></svg>
+                Logout
+            </button>
         </div>
     </nav>
 
@@ -56,7 +64,7 @@
                                             <img ng-src="{{categCtrl.getImageUrl(category.category_image)}}" alt="{{category.category_name}}" style="width: 50px; height: 50px; object-fit: cover;">
                                         </td>
                                         <td>{{category.category_name}}</td>
-                                        <td>{{category.category_description | limitTo: 40}}{{category.category_description.length > 40 ? '...' : ''}}</td>
+                                        <td>{{category.category_description | limitTo: 50}}{{category.category_description.length > 40 ? '...' : ''}}</td>
                                         <td>
                                             <button class="btn btn-sm btn-primary me-1 mb-1" ng-click="categCtrl.fetchProducts(category); categCtrl.currentCategoryId = category.id; categCtrl.currentCategoryName = category.category_name">View Products</button>
                                             <button class="btn btn-sm btn-danger ml-3" ng-click="categCtrl.deleteCategory(category.id)">Delete</button>
